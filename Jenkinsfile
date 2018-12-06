@@ -1,4 +1,12 @@
-node {
+#!/usr/bin/env groovy
+
+def imageName = 'odiarra/hellojira'
+
+properties([
+    buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5')),
+    pipelineTriggers([[$class:"SCMTrigger", scmpoll_spec:"H/15 * * * *"]]),
+])
+node('image docker'){
     
     def app 
 
@@ -8,10 +16,10 @@ node {
     }        
     stage('Build image'){ 
             
-        app = docker.build('odiarra/hellojira') 
+        app = docker.build("${imageName}:${imageTag}", 'jira') 
     }    
         
-    stage('Test') {
+    stage('Test image') {
              
         app.inside {
         	sh 'echo "Tests passed"'
